@@ -122,8 +122,8 @@ if [ -e /sys/class/net/${DEVICE}/mode ]; then
     else
         echo datagram > /sys/class/net/${DEVICE}/mode
 	# cap the MTU where we should based upon mode
-	[ -z "$MTU" ] && MTU=2044
-	[ "$MTU" -gt 2044 ] && MTU=2044
+	[ -z "$MTU" ] && MTU=4092
+	[ "$MTU" -gt 4092 ] && MTU=4092
     fi
 fi
 

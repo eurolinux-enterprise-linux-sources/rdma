@@ -1,8 +1,14 @@
 #!/bin/bash
 
 inst /etc/rdma/rdma.conf
+inst /etc/rdma/mlx4.conf
+inst /etc/modprobe.d/mlx4.conf
+inst /etc/modprobe.d/libmlx4.conf
+inst /etc/modprobe.d/libcxgb3.conf
+inst /etc/modprobe.d/libcxgb4.conf
 inst_hook pre-mount 50 "$moddir/rdma.sh"
 inst /usr/libexec/rdma-fixup-mtrr.awk
-dracut_install lsmod rmmod modprobe awk grep
+inst /usr/libexec/mlx4-setup.sh
+dracut_install lsmod rmmod modprobe awk grep lspci setpci /bin/bash
 inst_rules 90-infiniband.rules
 

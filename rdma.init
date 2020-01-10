@@ -22,7 +22,7 @@ CONFIG=/etc/rdma/rdma.conf
 LOAD_ULP_MODULES=""
 LOAD_CORE_USER_MODULES="ib_umad ib_uverbs ib_ucm rdma_ucm"
 LOAD_CORE_CM_MODULES="iw_cm ib_cm rdma_cm"
-LOAD_CORE_MODULES="ib_core ib_mad ib_sa ib_addr"
+LOAD_CORE_MODULES="ib_addr ib_core ib_mad ib_sa"
 
 if [ -f $CONFIG ]; then
     . $CONFIG
@@ -54,7 +54,7 @@ UNLOAD_ULP_MODULES="ib_iser ib_srp rds_rdma ib_ipoib"
 UNLOAD_HW_MODULES="iw_c2 iw_cxgb4 iw_cxgb3 iw_nes ib_ehca ib_ipath ib_mthca mlx4_ib ib_qib mlx5_ib mlx5_core ocrdma"
 UNLOAD_CORE_USER_MODULES="rdma_ucm ib_ucm ib_uverbs ib_umad"
 UNLOAD_CORE_CM_MODULES="rdma_cm ib_cm iw_cm"
-UNLOAD_CORE_MODULES="ib_addr ib_sa ib_mad ib_core"
+UNLOAD_CORE_MODULES="ib_sa ib_mad ib_core ib_addr"
 
 # We support renaming ib? interfaces to named interfaces, so do scan for link
 # type infiniband and pull out whatever names are present
@@ -173,8 +173,16 @@ load_hardware_modules()
 	load_modules mlx4_ib
 	RC+=$?
     fi
+    if is_module mlx5_core -a ! is_module mlx5_ib; then
+	load_modules mlx5_ib
+	RC+=$?
+    fi
     if is_module be2net -a ! is_module ocrdma; then
     	load_modules ocrdma
+	RC+=$?
+    fi
+    if is_module enic -a ! is_module usnic_verbs; then
+    	load_modules usnic_verbs
 	RC+=$?
     fi
     return $RC

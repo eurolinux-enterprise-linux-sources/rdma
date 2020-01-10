@@ -6,8 +6,8 @@
 
 Summary: Infiniband/iWARP Kernel Module Initializer
 Name: rdma
-Version: 6.6_3.15
-Release: 1%{?dist}
+Version: 6.7_3.15
+Release: 5%{?dist}
 License: GPLv2+
 Group: System Environment/Base
 Source0: rdma.conf
@@ -21,11 +21,19 @@ Source7: rdma.dracut.check
 Source8: rdma.dracut.install
 Source9: rdma.dracut.installkernel
 Source10: rdma.dracut.rdma.sh
+Source11: rdma.mlx4-sysmodprobe
+Source12: rdma.mlx4-usermodprobe
+Source13: rdma.mlx4.conf
+Source14: rdma.mlx4-setup.sh
+Source15: rdma.cxgb3-sysmodprobe
+Source16: rdma.cxgb4-sysmodprobe
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildArch: noarch
 Requires(post): chkconfig
 Requires(preun): chkconfig
 Requires: udev >= 145
+Requires: dracut, pciutils
+Conflicts: libmlx4 < 1.0.6-7.el6, libcxgb3 < 1.3.1-3.el6, libcxgb4 < 1.3.5-1.el6
 %description 
 User space initialization scripts for the kernel InfiniBand/iWARP drivers
 
@@ -37,9 +45,11 @@ User space initialization scripts for the kernel InfiniBand/iWARP drivers
 rm -rf %{buildroot}
 install -d %{buildroot}%{_initrddir}
 install -d %{buildroot}%{_sysconfdir}/%{name}
+install -d %{buildroot}%{_sysconfdir}/modprobe.d
 install -d %{buildroot}/lib/udev/rules.d
 install -d %{buildroot}%{_sysconfdir}/sysconfig/network-scripts
 install -d %{buildroot}%{rdma_moddir}
+install -d %{buildroot}%{_libexecdir}
 
 install -m 0644 %{SOURCE0} %{buildroot}%{_sysconfdir}/%{name}/%{name}.conf
 install -m 0755 %{SOURCE1} %{buildroot}%{_initrddir}/%{name}
@@ -52,6 +62,12 @@ install -m 0755 %{SOURCE7} %{buildroot}%{rdma_moddir}/check
 install -m 0755 %{SOURCE8} %{buildroot}%{rdma_moddir}/install
 install -m 0755 %{SOURCE9} %{buildroot}%{rdma_moddir}/installkernel
 install -m 0755 %{SOURCE10} %{buildroot}%{rdma_moddir}/rdma.sh
+install -m 0644 %{SOURCE11} %{buildroot}%{_sysconfdir}/modprobe.d/libmlx4.conf
+install -m 0644 %{SOURCE12} %{buildroot}%{_sysconfdir}/modprobe.d/mlx4.conf
+install -m 0644 %{SOURCE13} %{buildroot}%{_sysconfdir}/%{name}/mlx4.conf
+install -m 0755 %{SOURCE14} %{buildroot}%{_libexecdir}/mlx4-setup.sh
+install -m 0644 %{SOURCE15} %{buildroot}%{_sysconfdir}/modprobe.d/libcxgb3.conf
+install -m 0644 %{SOURCE16} %{buildroot}%{_sysconfdir}/modprobe.d/libcxgb4.conf
 
 %clean
 rm -rf %{buildroot}
@@ -59,10 +75,21 @@ rm -rf %{buildroot}
 %post
 if [ $1 = 1 ]; then
     /sbin/chkconfig --add %{name}
+    /sbin/chkconfig --add nfs-rdma
+else
+    /sbin/chkconfig --list nfs-rdma >/dev/null 2>&1
+    MISSING=$?
+    if [ "$MISSING" = 0 ]; then
+	chkconfig --level 0123456 nfs-rdma resetpriorities
+    else
+	chkconfig --add nfs-rdma
+    fi
 fi
 
 %preun
 if [ $1 = 0 ]; then
+    # In case this script was never added, be silent
+    /sbin/chkconfig --del nfs-rdma >/dev/null 2>&1
     /sbin/chkconfig --del %{name}
 fi
 
@@ -70,15 +97,43 @@ fi
 %defattr(-,root,root,-)
 %dir %{_sysconfdir}/%{name}
 %config(noreplace) %{_sysconfdir}/%{name}/%{name}.conf
+%config(noreplace) %{_sysconfdir}/%{name}/mlx4.conf
 %{_sysconfdir}/%{name}/fixup-mtrr.awk
 %{_initrddir}/%{name}
 %{_initrddir}/nfs-rdma
 %{_sysconfdir}/sysconfig/network-scripts/ifup-ib
 %{_sysconfdir}/sysconfig/network-scripts/ifdown-ib
+%{_sysconfdir}/modprobe.d/libmlx4.conf
+%{_sysconfdir}/modprobe.d/libcxgb?.conf
+%config(noreplace) %{_sysconfdir}/modprobe.d/mlx4.conf
+%{_libexecdir}/mlx4-setup.sh
 /lib/udev/rules.d/90-infiniband.rules
 %{rdma_moddir}
 
 %changelog
+* Wed May 20 2015 Doug Ledford <dledford@redhat.com> - 6.7_3.15-5
+- Add requires on pciutils
+- Resolves: bz1236042
+
+* Tue May 19 2015 Doug Ledford <dledford@redhat.com> - 6.7_3.15-4
+- Fix modprobe file so command line opts passed to modprobe mlx4_core will
+  work again
+- Resolves: bz1215857
+
+* Thu Mar 12 2015 Doug Ledford <dledford@redhat.com> - 6.7_3.15-3
+- A few touchups to the move of dracut files and such
+- Related: bz1163527
+
+* Thu Mar 12 2015 Doug Ledford <dledford@redhat.com> - 6.7_3.15-2
+- Fix ipoib MTU issue
+- Fix shutdown ordering of NFSoRDMA code
+- Absorb mlx4/cxgb3/cxgb4 setup/module init code into our package
+- Resolves: bz1186498, bz1163527
+
+* Fri Jan 23 2015 Doug Ledford <dledford@redhat.com> - 6.7_3.15-1
+- Fix module unload issue
+- Resolves: bz1159331
+
 * Wed Jun 18 2014 Doug Ledford <dledford@redhat.com> - 6.6_3.15-1
 - Change numbering scheme to be clearer: first number is redhat
   release this package is for (aka rhel6.6), second number is the

@@ -2,7 +2,7 @@
 #
 # Bring up/down NFSoRDMA support
 #
-# chkconfig: - 31 59
+# chkconfig: - 31 61
 # description: Enables/Disables NFS over RDMA interfaces
 # config:	/etc/rdma/rdma.conf
 #
@@ -10,6 +10,7 @@
 # Provides:       nfs-rdma
 # Default-Stop: 0 1 2 3 4 5 6
 # Required-Start: $network $rdma $nfs
+# Required-Stop: $nfs
 # Short-Description: Enables/Disables NFS over RDMA interfaces
 # Description: Enables/Disables NFS over RDMA interfaces
 ### END INIT INFO

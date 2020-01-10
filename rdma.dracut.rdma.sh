@@ -4,28 +4,28 @@ CONFIG=/etc/rdma/rdma.conf
 LOAD_ULP_MODULES=""
 LOAD_CORE_USER_MODULES="ib_umad ib_uverbs ib_ucm rdma_ucm"
 LOAD_CORE_CM_MODULES="iw_cm ib_cm rdma_cm"
-LOAD_CORE_MODULES="ib_core ib_mad ib_sa ib_addr"
+LOAD_CORE_MODULES="ib_addr ib_core ib_mad ib_sa"
 
 if [ -f $CONFIG ]; then
     . $CONFIG
 
-    if [ "x${RDS_LOAD}" = "xyes" ]; then
+    if [ "${RDS_LOAD}" = "yes" ]; then
         IPOIB_LOAD=yes
     fi
 
-    if [ "x${IPOIB_LOAD}" = "xyes" ]; then
+    if [ "${IPOIB_LOAD}" = "yes" ]; then
 	LOAD_ULP_MODULES="ib_ipoib"
     fi
 
-    if [ "x${RDS_LOAD}" = "xyes" ]; then
+    if [ "${RDS_LOAD}" = "yes" ]; then
 	LOAD_ULP_MODULES="$LOAD_ULP_MODULES rds"
     fi
 
-    if [ "x${SRP_LOAD}" = "xyes" ]; then
+    if [ "${SRP_LOAD}" = "yes" ]; then
 	LOAD_ULP_MODULES="$LOAD_ULP_MODULES ib_srp"
     fi
 
-    if [ "x${ISER_LOAD}" = "xyes" ]; then
+    if [ "${ISER_LOAD}" = "yes" ]; then
 	LOAD_ULP_MODULES="$LOAD_ULP_MODULES ib_iser"
     fi
 else
@@ -104,12 +104,26 @@ load_hardware_modules()
     if [ $RC1 -ne $RC2 ]; then
 	load_modules mlx4_ib
     fi
+    is_module mlx5_core
+    RC1=$?
+    is_module mlx5_ib
+    RC2=$?
+    if [ $RC1 -ne $RC2 ]; then
+	load_modules mlx5_ib
+    fi
     is_module be2net
     RC1=$?
     is_module ocrdma
     RC2=$?
     if [ $RC1 -ne $RC2 ]; then
     	load_modules ocrdma
+    fi
+    is_module enic
+    RC1=$?
+    is_module usnic_verbs
+    RC2=$?
+    if [ $RC1 -ne $RC2 ]; then
+    	load_modules usnic_verbs
     fi
 }
 
