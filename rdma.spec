@@ -7,7 +7,7 @@
 Summary: Infiniband/iWARP Kernel Module Initializer
 Name: rdma
 Version: 6.8_4.1
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2+
 Group: System Environment/Base
 Source0: rdma.conf
@@ -111,6 +111,10 @@ fi
 %{rdma_moddir}
 
 %changelog
+* Tue Dec 06 2016 Jarod Wilson <jarod@redhat.com> - 6.8_4.1-2
+- Add support for including Mellanox drivers under kernel-rt
+- Resolves: rhbz#1401858
+
 * Fri Mar 18 2016 Donald Dutile <ddutile@redhat.com> - 6.8_4.1-1
 - Add CMDLINE_OPTS for cxgb modules
 - Resolves: bz1205092

@@ -1,2 +1,2 @@
 #!/bin/bash
-instmods "=drivers/infiniband" "=drivers/net/mlx4" "=drivers/net/mlx5" cxgb3 cxgb4
+instmods "=drivers/infiniband" "=drivers/net/mlx4" "=drivers/net/mlx5" "=drivers/net/ethernet/mellanox" cxgb3 cxgb4
