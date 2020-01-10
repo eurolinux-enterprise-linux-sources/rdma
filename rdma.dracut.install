@@ -1,0 +1,8 @@
+#!/bin/bash
+
+inst /etc/rdma/rdma.conf
+inst_hook pre-mount 50 "$moddir/rdma.sh"
+inst /usr/libexec/rdma-fixup-mtrr.awk
+dracut_install lsmod rmmod modprobe awk grep
+inst_rules 90-infiniband.rules
+

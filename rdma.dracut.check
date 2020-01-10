@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ -n "$hostonly" ]; then
+	[ -d /sys/class/infiniband_verbs/uverbs0 ] && exit 0
+	exit 1
+fi
+exit 0
+
