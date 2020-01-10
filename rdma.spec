@@ -6,8 +6,8 @@
 
 Summary: Infiniband/iWARP Kernel Module Initializer
 Name: rdma
-Version: 6.7_3.15
-Release: 5%{?dist}
+Version: 6.8_4.1
+Release: 1%{?dist}
 License: GPLv2+
 Group: System Environment/Base
 Source0: rdma.conf
@@ -111,6 +111,10 @@ fi
 %{rdma_moddir}
 
 %changelog
+* Fri Mar 18 2016 Donald Dutile <ddutile@redhat.com> - 6.8_4.1-1
+- Add CMDLINE_OPTS for cxgb modules
+- Resolves: bz1205092
+
 * Wed May 20 2015 Doug Ledford <dledford@redhat.com> - 6.7_3.15-5
 - Add requires on pciutils
 - Resolves: bz1236042
