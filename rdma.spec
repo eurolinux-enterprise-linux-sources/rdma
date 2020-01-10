@@ -6,8 +6,8 @@
 
 Summary: Infiniband/iWARP Kernel Module Initializer
 Name: rdma
-Version: 6.8_4.1
-Release: 2%{?dist}
+Version: 6.9_4.1
+Release: 3%{?dist}
 License: GPLv2+
 Group: System Environment/Base
 Source0: rdma.conf
@@ -111,9 +111,17 @@ fi
 %{rdma_moddir}
 
 %changelog
-* Tue Dec 06 2016 Jarod Wilson <jarod@redhat.com> - 6.8_4.1-2
+* Tue Nov 22 2016 Jarod Wilson <jarod@redhat.com> - 6.9_4.1-3
 - Add support for including Mellanox drivers under kernel-rt
-- Resolves: rhbz#1401858
+- Resolves: rhbz#1389554
+
+* Tue Nov 01 2016 Jarod Wilson <jarod@redhat.com> - 6.9_4.1-2
+- Don't try to load modules that don't exist
+- Resolves: rhbz#1388061
+
+* Wed Aug 10 2016 Jarod Wilson <jarod@redhat.com> - 6.9_4.1-1
+- Default initscript to enabled for IPoIB setups
+- Resolves: rhbz#1116631
 
 * Fri Mar 18 2016 Donald Dutile <ddutile@redhat.com> - 6.8_4.1-1
 - Add CMDLINE_OPTS for cxgb modules
