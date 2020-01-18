@@ -15,6 +15,7 @@ LOAD_ULP_MODULES=""
 LOAD_CORE_USER_MODULES="ib_umad ib_uverbs ib_ucm rdma_ucm"
 LOAD_CORE_CM_MODULES="iw_cm ib_cm rdma_cm"
 LOAD_CORE_MODULES="ib_core ib_mad ib_sa ib_addr"
+LOAD_TECH_PREVIEW_DRIVERS="no"
 
 if [ -f $CONFIG ]; then
     . $CONFIG
@@ -60,12 +61,15 @@ if [ -f $CONFIG ]; then
     if [ "${SVCRDMA_LOAD}" == "yes" ]; then
 	LOAD_ULP_MODULES="$LOAD_ULP_MODULES svcrdma"
     fi
+    if [ "${TECH_PREVIEW_LOAD}" == "yes" ]; then
+        LOAD_TECH_PREVIEW_DRIVERS="$TECH_PREVIEW_LOAD"
+    fi
 else
     LOAD_ULP_MODULES="ib_ipoib"
 fi
 
 # If module $1 is loaded return - 0 else - 1
-is_module()
+is_loaded()
 {
     /sbin/lsmod | grep -w "$1" > /dev/null 2>&1
     return $?
@@ -76,7 +80,11 @@ load_modules()
     local RC=0
 
     for module in $*; do
-	if ! is_module $module; then
+	if ! /sbin/modinfo $module > /dev/null 2>&1; then
+	    # do not attempt to load modules which do not exist
+	    continue
+	fi
+	if ! is_loaded $module; then
 	    /sbin/modprobe $module
 	    res=$?
 	    RC=$[ $RC + $res ]
@@ -111,7 +119,7 @@ check_mtrr_registers()
     # reload the ib_ipath module for us, so there shouldn't be a problem.
     [ -f /proc/mtrr -a -f $MTRR_SCRIPT ] &&
 	awk -f $MTRR_SCRIPT /proc/mtrr 2>/dev/null &&
-	if is_module ib_ipath; then
+	if is_loaded ib_ipath; then
 		/sbin/rmmod ib_ipath
 	fi
 }
@@ -128,39 +136,45 @@ load_hardware_modules()
     udevadm settle
     if [ -r /proc/device-tree ]; then
 	if [ -n "`ls /proc/device-tree | grep lhca`" ]; then
-	    if ! is_module ib_ehca; then
+	    if ! is_loaded ib_ehca; then
 		load_modules ib_ehca
 		RC+=$?
 	    fi
 	fi
     fi
-    if is_module mlx4_core -a ! is_module mlx4_ib; then
+    if is_loaded mlx4_core -a ! is_loaded mlx4_ib; then
         load_modules mlx4_ib
 	RC+=$?
     fi
-    if is_module mlx4_core -a ! is_module mlx4_en; then
+    if is_loaded mlx4_core -a ! is_loaded mlx4_en; then
         load_modules mlx4_en
 	RC+=$?
     fi
-    if is_module mlx5_core -a ! is_module mlx5_ib; then
+    if is_loaded mlx5_core -a ! is_loaded mlx5_ib; then
 	load_modules mlx5_ib
 	RC+=$?
     fi
-    if is_module cxgb3 -a ! is_module iw_cxgb3; then
+    if is_loaded cxgb3 -a ! is_loaded iw_cxgb3; then
 	load_modules iw_cxgb3
 	RC+=$?
     fi
-    if is_module cxgb4 -a ! is_module iw_cxgb4; then
+    if is_loaded cxgb4 -a ! is_loaded iw_cxgb4; then
 	load_modules iw_cxgb4
 	RC+=$?
     fi
-    if is_module be2net -a ! is_module ocrdma; then
+    if is_loaded be2net -a ! is_loaded ocrdma; then
 	load_modules ocrdma
 	RC+=$?
     fi
-    if is_module enic -a ! is_module usnic_verbs; then
+    if is_loaded enic -a ! is_loaded usnic_verbs; then
 	load_modules usnic_verbs
 	RC+=$?
+    fi
+    if [ "${LOAD_TECH_PREVIEW_DRIVERS}" == "yes" ]; then
+        if is_loaded i40e -a ! is_loaded i40iw; then
+	    load_modules i40iw
+	    RC+=$?
+        fi
     fi
     return $RC
 }

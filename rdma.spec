@@ -5,8 +5,8 @@
 
 Summary: Infiniband/iWARP Kernel Module Initializer
 Name: rdma
-Version: 7.2_4.1_rc6
-Release: 2%{?dist}
+Version: 7.3_4.7_rc2
+Release: 5%{?dist}
 License: GPLv2+
 Group: System Environment/Base
 Source0: rdma.conf
@@ -33,6 +33,7 @@ Requires: udev >= 095, systemd-units, dracut
 Requires(post): systemd-units
 Requires(preun): systemd-units
 Requires(postun): systemd-units
+Requires: pciutils
 Conflicts: initscripts <= 9.49.16-1, libmlx4 <= 1.0.6-2, libcxgb3 <= 1.3.1-6, libcxgb4 <= 1.3.5-1
 %global dracutlibdir %{_prefix}/lib/dracut
 %global sysmodprobedir %{_prefix}/lib/modprobe.d
@@ -107,9 +108,36 @@ rm -rf %{buildroot}
 %{_libexecdir}/mlx4-setup.sh
 
 %changelog
-* Thu Nov 05 2015 Donald Dutile <ddutile@redhat.com - 7.2_4.1_rc6-2
+* Tue Aug 23 2016 Jarod Wilson <jarod@redhat.com> - 7.3_4.7-rc2-5
+- Add a knob for loading on tech preview (i40iw) hardware
+- Make "is module loaded" function name more accurate
+- Related: bz1263936
+
+* Tue Jun 28 2016 Jarod Wilson <jarod@redhat.com> - 7.3_4.7-rc2-4
+- Add requirement for pciutils to be installed
+- Resolves: bz1350720
+
+* Fri Jun 17 2016 Jarod Wilson <jarod@redhat.com> - 7.3_4.7-rc2-3
+- Add target modules to initrd module include list for rdma service start in initrd
+- Add iscsi modules to allow iser/iscsi network install/boot
+- Resolves: bz1347548, bz1093972
+
+* Wed Jun 15 2016 Jarod Wilson <jarod@redhat.com> - 7.3_4.7-rc2-2
+- Fix up dracut module to not exclude infiniband drivers in non-hostonly mode
+- Resolves: bz1346113
+
+* Fri Jun 10 2016 Jarod Wilson <jarod@redhat.com> - 7.3_4.7-rc2-1
+- Bump version to reflect rdma stack backport target level in 7.3
+- Verify fix to ensure all rdma drivers get into initrd
+- Related: bz1303589
+
+* Tue May 10 2016 Yaakov Selkowitz <yselkowi@redhat.com> - 7.3_4.1_rc6-2
+- Check module presence before attempting to load
+- Resolves: bz1263936
+
+* Thu Nov 05 2015 Donald Dutile <ddutile@redhat.com>> - 7.3_4.1_rc6-1
 - Pass module load params for cxgb3, cxgb4 and mlx4
-- Resolves: bz1278557
+- Resolves: bz1191046
 
 * Wed Jun 24 2015 Honggang Li <honli@redhat.com> - 7.2_4.1_rc6-1
 - Update version to match kernel submission
