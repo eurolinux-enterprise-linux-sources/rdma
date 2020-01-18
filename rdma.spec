@@ -5,8 +5,8 @@
 
 Summary: Infiniband/iWARP Kernel Module Initializer
 Name: rdma
-Version: 7.1_3.17
-Release: 5%{?dist}
+Version: 7.2_4.1_rc6
+Release: 1%{?dist}
 License: GPLv2+
 Group: System Environment/Base
 Source0: rdma.conf
@@ -107,6 +107,26 @@ rm -rf %{buildroot}
 %{_libexecdir}/mlx4-setup.sh
 
 %changelog
+* Wed Jun 24 2015 Honggang Li <honli@redhat.com> - 7.2_4.1_rc6-1
+- Update version to match kernel submission
+- Fix two documentation issues
+- Related: bz1227995
+
+* Mon Jun 22 2015 Michal Schmidt <mschmidt@redhat.com> - 7.2_3.17-2
+- udev rules: Defer setting of node description to rdma-ndd if it is
+  installed.
+- Related: bz1169968
+
+* Fri Jun 05 2015 Doug Ledford <dledford@redhat.com> - 7.2_3.17-1
+- Rebuilding for 7.2
+- Resolves: bz1227995
+
+* Mon Feb 02 2015 Doug Ledford <dledford@redhat.com> - 7.1_3.17-6
+- The system libmlx4.conf file had the name of the config script
+  backwards and on systems with ethernet devices in ib/eth mode,
+  the eth port was not getting set properly
+- Related: bz1164618
+
 * Thu Jan 08 2015 Doug Ledford <dledford@redhat.com> - 7.1_3.17-5
 - Bump and rebuild to eliminate an rpm version compare issue on alternate
   arches that don't use the .el7 dist tag

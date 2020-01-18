@@ -1,5 +1,5 @@
 # This file is intended for users to select the various module options
-# they need for the mlx4 driver.  On upgrade of the libmlx4 package,
+# they need for the mlx4 driver.  On upgrade of the rdma package,
 # any user made changes to this file are preserved.  Any changes made
 # to the libmlx4.conf file in this directory are overwritten on
 # pacakge upgrade.
