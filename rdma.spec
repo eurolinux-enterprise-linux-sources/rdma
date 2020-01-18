@@ -6,7 +6,7 @@
 Summary: Infiniband/iWARP Kernel Module Initializer
 Name: rdma
 Version: 7.2_4.1_rc6
-Release: 1%{?dist}
+Release: 2%{?dist}
 License: GPLv2+
 Group: System Environment/Base
 Source0: rdma.conf
@@ -107,6 +107,10 @@ rm -rf %{buildroot}
 %{_libexecdir}/mlx4-setup.sh
 
 %changelog
+* Thu Nov 05 2015 Donald Dutile <ddutile@redhat.com - 7.2_4.1_rc6-2
+- Pass module load params for cxgb3, cxgb4 and mlx4
+- Resolves: bz1278557
+
 * Wed Jun 24 2015 Honggang Li <honli@redhat.com> - 7.2_4.1_rc6-1
 - Update version to match kernel submission
 - Fix two documentation issues
