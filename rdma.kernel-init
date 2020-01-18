@@ -162,10 +162,6 @@ load_hardware_modules()
 	load_modules iw_cxgb4
 	RC+=$?
     fi
-    if is_loaded be2net -a ! is_loaded ocrdma; then
-	load_modules ocrdma
-	RC+=$?
-    fi
     if is_loaded enic -a ! is_loaded usnic_verbs; then
 	load_modules usnic_verbs
 	RC+=$?
@@ -173,6 +169,10 @@ load_hardware_modules()
     if [ "${LOAD_TECH_PREVIEW_DRIVERS}" == "yes" ]; then
         if is_loaded i40e -a ! is_loaded i40iw; then
 	    load_modules i40iw
+	    RC+=$?
+        fi
+        if is_loaded be2net -a ! is_loaded ocrdma; then
+	    load_modules ocrdma
 	    RC+=$?
         fi
     fi

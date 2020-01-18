@@ -6,7 +6,7 @@
 Summary: Infiniband/iWARP Kernel Module Initializer
 Name: rdma
 Version: 7.3_4.7_rc2
-Release: 5%{?dist}
+Release: 6%{?dist}
 License: GPLv2+
 Group: System Environment/Base
 Source0: rdma.conf
@@ -108,6 +108,10 @@ rm -rf %{buildroot}
 %{_libexecdir}/mlx4-setup.sh
 
 %changelog
+* Thu Feb 02 2017 Jarod Wilson <jarod@redhat.com> - 7.3_4.7-rc2-6
+- Don't load tech preview ocdrma driver unless requested by config
+- Resolves: bz1422821
+
 * Tue Aug 23 2016 Jarod Wilson <jarod@redhat.com> - 7.3_4.7-rc2-5
 - Add a knob for loading on tech preview (i40iw) hardware
 - Make "is module loaded" function name more accurate
